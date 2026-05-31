@@ -5,6 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
 const knex_1 = __importDefault(require("knex"));
-const knexfile_1 = __importDefault(require("../../knexfile"));
 const env_1 = require("./env");
-exports.db = (0, knex_1.default)(knexfile_1.default[env_1.env.nodeEnv] || knexfile_1.default.development);
+const config = require('../../knexfile.js');
+exports.db = (0, knex_1.default)(config[env_1.env.nodeEnv] || config.development);
