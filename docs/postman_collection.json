@@ -1,0 +1,10 @@
+{
+  "info": { "name": "Lendsqr Wallet Service", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/health" } },
+    { "name": "Create User", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/users", "body": { "mode": "raw", "raw": "{\n  \"firstName\": \"Ada\",\n  \"lastName\": \"Lovelace\",\n  \"email\": \"ada@example.com\",\n  \"phone\": \"+2347012345678\",\n  \"bvn\": \"22212345678\"\n}" } } },
+    { "name": "Fund Wallet", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/users/{{userId}}/wallet/fund", "body": { "mode": "raw", "raw": "{\n  \"amount\": 5000,\n  \"description\": \"Loan disbursement\"\n}" } } },
+    { "name": "Transfer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/users/{{userId}}/wallet/transfer", "body": { "mode": "raw", "raw": "{\n  \"receiverUserId\": \"receiver_public_id\",\n  \"amount\": 1000\n}" } } },
+    { "name": "Withdraw", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "url": "{{baseUrl}}/api/v1/users/{{userId}}/wallet/withdraw", "body": { "mode": "raw", "raw": "{\n  \"amount\": 500\n}" } } }
+  ]
+}

@@ -1,0 +1,9 @@
+Hello, my name is <your name>. This is my Demo Credit wallet service assessment. I built a Node.js TypeScript API using Express, Knex, and MySQL. The API supports account creation, wallet funding, wallet transfer, and withdrawal.
+
+For onboarding, I integrated the Lendsqr Adjutor Karma lookup. When a user signs up, the service checks email, phone, and BVN. If a matching identity is found on Karma, the user is not onboarded.
+
+For wallet operations, I used database transactions so balance updates and transaction records are committed together. For transfers, the sender debit, receiver credit, and transaction record happen in one transaction. I also used decimal handling for money values to avoid floating point issues.
+
+The project includes unit tests for successful flows and negative cases like blacklisted users, insufficient funds, and missing authentication. The README includes the ER diagram, setup instructions, API endpoints, deployment guide, and improvement plan.
+
+Thank you.
