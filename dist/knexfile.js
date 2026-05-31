@@ -19,3 +19,4 @@ const development = {
 };
 
 module.exports = { development, production, test: development };
+module.exports.default = { development, production, test: development };
