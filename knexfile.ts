@@ -40,4 +40,4 @@ const config: Record<string, Knex.Config> = {
 };
 
 export default config;
-module.exports = config;
+
