@@ -4,18 +4,18 @@ This is a Minimum Viable Product wallet API for Demo Credit. Borrowers can creat
 
 ## Live service
 
-Replace this after deployment:
+
 
 ```text
-https://<candidate-name>-lendsqr-be-test.<cloud-platform-domain>
+https://bhargav870-lendsqr-be-test-7bd93a7618f9.herokuapp.com
 ```
 
 ## GitHub repository
 
-Replace this after pushing the code:
+
 
 ```text
-https://github.com/<github-username>/lendsqr-wallet-service
+https://github.com/bhargav870/lendsqr-wallet-service
 ```
 
 ## Tech stack
