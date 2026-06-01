@@ -2,23 +2,19 @@
 
 This is a Minimum Viable Product wallet API for Demo Credit. Borrowers can create an account, receive loan disbursement into their wallet, transfer funds to another user, and withdraw funds. During onboarding, the service checks the user's identity against Lendsqr Adjutor Karma before creating the wallet.
 
-## Live service
+## Live Service
 
-
-
-```text
+```
 https://bhargav870-lendsqr-be-test-7bd93a7618f9.herokuapp.com
 ```
 
-## GitHub repository
+## GitHub Repository
 
-
-
-```text
+```
 https://github.com/bhargav870/lendsqr-wallet-service
 ```
 
-## Tech stack
+## Tech Stack
 
 - Node.js LTS
 - TypeScript
@@ -28,7 +24,7 @@ https://github.com/bhargav870/lendsqr-wallet-service
 - Jest
 - Lendsqr Adjutor Karma API
 
-## Main features
+## Main Features
 
 - Create a user account and wallet.
 - Block onboarding when the user identity is found on Lendsqr Karma blacklist.
@@ -41,11 +37,11 @@ https://github.com/bhargav870/lendsqr-wallet-service
 - Use faux bearer-token authentication for protected endpoints.
 - Include unit tests for positive and negative scenarios.
 
-## Architecture approach
+## Architecture Approach
 
 The project uses a small layered architecture:
 
-```text
+```
 HTTP Request
   -> Route
   -> Validation middleware
@@ -59,7 +55,7 @@ Controllers only handle request and response flow. Business rules are placed in 
 
 The transfer flow updates the sender wallet, receiver wallet, and transaction table inside one transaction. This prevents cases where money is debited without being credited, or credited without a transaction record.
 
-## ER diagram
+## ER Diagram
 
 ```mermaid
 erDiagram
@@ -105,151 +101,93 @@ erDiagram
     }
 ```
 
-## Database design
+## Database Design
 
 ### users
-
 Stores customer identity data needed for onboarding and Karma lookup.
-
-Important constraints:
-
 - `email` is unique.
 - `phone` is unique when provided.
 - `bvn` is unique when provided.
 - `public_id` is exposed through API instead of internal database id.
 
 ### wallets
-
 Stores one wallet per user.
-
-Important constraints:
-
 - `user_id` is unique so a user cannot have multiple wallets in this MVP.
 - `balance` is stored as `DECIMAL(18,2)` to avoid floating-point money errors.
 
 ### transactions
-
 Stores audit records for all money movement.
-
-Important constraints:
-
 - `reference` is unique.
 - `type` is one of `FUND`, `TRANSFER`, or `WITHDRAWAL`.
 - `source_wallet_id` is nullable for funding.
 - `destination_wallet_id` is nullable for withdrawal.
 
-## Lendsqr Adjutor Karma integration
+## Lendsqr Adjutor Karma Integration
 
-On user creation, the API checks available identities in this order:
-
-- email
-- phone
-- BVN
+On user creation, the API checks available identities in this order: email, phone, BVN.
 
 If any identity is found in Karma, onboarding is rejected with `403 KARMA_BLACKLISTED`.
 
-Karma endpoint used:
-
-```text
+```
 GET /verification/karma/:identity
+Base URL: https://adjutor.lendsqr.com/v2
 ```
-
-Base URL used by default:
-
-```text
-https://adjutor.lendsqr.com/v2
-```
-
-If `ADJUTOR_API_KEY` is empty, the code skips the external call. This makes local development and tests easy. In production or deployed review mode, add a real Adjutor API key and keep `KARMA_CHECK_ENABLED=true`.
 
 ## Authentication
 
 This MVP uses a faux token authentication system as allowed by the assessment.
 
-Send this header on all protected requests:
-
-```text
+```
 Authorization: Bearer demo-credit-test-token
 ```
 
-The token can be changed through `API_TOKEN` in `.env`.
+## API Endpoints
 
-## API endpoints
+Base URL: `/api/v1`
 
-Base URL:
-
-```text
-/api/v1
-```
-
-### Health check
-
-```http
-GET /health
-```
-
-### Create user and wallet
-
+### Create User and Wallet
 ```http
 POST /users
 Authorization: Bearer demo-credit-test-token
 Content-Type: application/json
-```
 
-Request body:
-
-```json
 {
-  "firstName": "Ada",
-  "lastName": "Lovelace",
-  "email": "ada@example.com",
+  "firstName": "Venkata",
+  "lastName": "Bhargav",
+  "email": "bhargav@example.com",
   "phone": "+2347012345678",
   "bvn": "22212345678"
 }
 ```
 
-### Get user and wallet
-
+### Get User and Wallet
 ```http
 GET /users/:userId
 Authorization: Bearer demo-credit-test-token
 ```
 
-### Get wallet balance
-
+### Get Wallet Balance
 ```http
 GET /users/:userId/wallet
 Authorization: Bearer demo-credit-test-token
 ```
 
-### Fund wallet
-
+### Fund Wallet
 ```http
 POST /users/:userId/wallet/fund
 Authorization: Bearer demo-credit-test-token
-Content-Type: application/json
-```
 
-Request body:
-
-```json
 {
   "amount": 5000,
   "description": "Loan disbursement"
 }
 ```
 
-### Transfer funds
-
+### Transfer Funds
 ```http
 POST /users/:userId/wallet/transfer
 Authorization: Bearer demo-credit-test-token
-Content-Type: application/json
-```
 
-Request body:
-
-```json
 {
   "receiverUserId": "receiver_public_id",
   "amount": 1000,
@@ -257,24 +195,18 @@ Request body:
 }
 ```
 
-### Withdraw funds
-
+### Withdraw Funds
 ```http
 POST /users/:userId/wallet/withdraw
 Authorization: Bearer demo-credit-test-token
-Content-Type: application/json
-```
 
-Request body:
-
-```json
 {
   "amount": 500,
   "description": "Cash withdrawal"
 }
 ```
 
-## Error response format
+## Error Response Format
 
 ```json
 {
@@ -285,7 +217,6 @@ Request body:
 ```
 
 Common errors:
-
 - `401 UNAUTHORIZED` for missing or invalid bearer token.
 - `403 KARMA_BLACKLISTED` for blocked onboarding.
 - `404 USER_NOT_FOUND` when the user id does not exist.
@@ -293,61 +224,30 @@ Common errors:
 - `422 INSUFFICIENT_FUNDS` for overdraft attempts.
 - `422 VALIDATION_ERROR` for invalid request body.
 
-## Local setup
-
-### 1. Install dependencies
+## Local Setup
 
 ```bash
+# 1. Install dependencies
 npm install
-```
 
-### 2. Create environment file
-
-```bash
+# 2. Create environment file
 cp .env.example .env
-```
 
-Update `.env` with your Adjutor API key:
-
-```text
-ADJUTOR_API_KEY=your_key_here
-```
-
-### 3. Start MySQL
-
-```bash
-docker compose up -d
-```
-
-### 4. Run migrations
-
-```bash
+# 3. Run migrations
 npm run migrate
-```
 
-### 5. Start development server
-
-```bash
+# 4. Start development server
 npm run dev
 ```
 
-The service runs at:
-
-```text
-http://localhost:3000/api/v1/health
-```
-
-## Running tests
+## Running Tests
 
 ```bash
 mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS wallet_service_test;"
 npm test
 ```
 
-The tests use a separate MySQL test database. Create `wallet_service_test` locally or set `TEST_DB_NAME`, then run `npm test`.
-
 Covered test cases:
-
 - User creation creates wallet.
 - Blacklisted user is not onboarded.
 - Wallet funding succeeds.
@@ -357,134 +257,34 @@ Covered test cases:
 - Withdrawal fails on overdraft.
 - Protected routes reject missing token.
 
-## Deployment guide: Render free web service
-
-Render is easier than Heroku for a free deployment.
-
-1. Push this folder to GitHub.
-2. Create a MySQL database. You can use Railway, Aiven, PlanetScale, or any MySQL provider.
-3. Create a Render Web Service from the GitHub repository.
-4. Set the build command:
-
-```bash
-npm install && npm run build
-```
-
-5. Set the start command:
-
-```bash
-npm run migrate && npm start
-```
-
-6. Add environment variables:
-
-```text
-NODE_ENV=production
-PORT=10000
-API_TOKEN=demo-credit-test-token
-DB_HOST=<mysql-host>
-DB_PORT=3306
-DB_USER=<mysql-user>
-DB_PASSWORD=<mysql-password>
-DB_NAME=<mysql-db-name>
-ADJUTOR_BASE_URL=https://adjutor.lendsqr.com/v2
-ADJUTOR_API_KEY=<your-adjutor-api-key>
-KARMA_CHECK_ENABLED=true
-```
-
-7. After deployment, test:
-
-```bash
-curl https://<candidate-name>-lendsqr-be-test.onrender.com/api/v1/health
-```
-
-## Deployment guide: Heroku
-
-1. Create a Heroku app named like this:
-
-```text
-<candidate-name>-lendsqr-be-test
-```
-
-2. Add a MySQL add-on or connect an external MySQL database.
-3. Set config vars using the same `.env.example` names.
-4. Deploy from GitHub or Heroku CLI.
-5. Run migrations:
-
-```bash
-heroku run npm run migrate
-```
-
-## Design decisions and reasons
+## Design Decisions and Reasons
 
 ### Why TypeScript?
-
-TypeScript improves maintainability by catching wrong request and service shapes early. It also makes the code easier to review because function inputs and expected data are explicit.
+TypeScript improves maintainability by catching wrong request and service shapes early. It makes the code easier to review because function inputs and expected data are explicit.
 
 ### Why Knex?
-
 Knex provides a clean query builder, migrations, and transaction support without hiding SQL too much. This is useful for a wallet system because transaction boundaries and row locking need to be clear.
 
-### Why decimal values for money?
-
+### Why Decimal Values for Money?
 Wallet balances should not use JavaScript floating point arithmetic. The database uses `DECIMAL(18,2)` and the service uses `decimal.js` to avoid precision errors.
 
-### Why a public user id?
-
+### Why a Public User ID?
 The API exposes `public_id` instead of the internal auto-increment id. This avoids leaking database ids and keeps the API safer.
 
-### Why one wallet per user?
+### Why One Wallet Per User?
+This is an MVP. The schema can later support multiple wallets by removing the unique constraint on `wallets.user_id`.
 
-This is an MVP. The schema can later support multiple wallets by removing the unique constraint on `wallets.user_id` and adding wallet type or currency rules.
-
-## What I would improve with more time
+## What I Would Improve With More Time
 
 - Add idempotency keys for fund, transfer, and withdrawal requests.
 - Add rate limiting.
-- Add a stronger authentication system with JWT or OAuth.
+- Add JWT or OAuth authentication.
 - Add webhook/audit log support.
-- Add a ledger double-entry model for stronger financial reconciliation.
-- Add integration tests against a real MySQL test container.
 - Add OpenAPI/Swagger documentation.
 - Add request tracing and structured logs.
 
-## Submission checklist
+## Author
 
-Submit these items:
-
-1. Public GitHub repository URL.
-2. Deployed API URL.
-3. Public document URL containing this README/design explanation and the deployed URL.
-4. Short video review link. Your face must be visible in the video, even when screen sharing, and it must not exceed 3 minutes.
-5. Google Form submission requested in the assessment.
-6. Email to `careers@lendsqr.com` confirming submission.
-
-## Suggested short video script
-
-Hello, my name is `<your name>`. This is my Demo Credit wallet service assessment. I built a Node.js TypeScript API using Express, Knex, and MySQL. The API supports account creation, wallet funding, wallet transfer, and withdrawal.
-
-For onboarding, I integrated the Lendsqr Adjutor Karma lookup. When a user signs up, the service checks email, phone, and BVN. If a matching identity is found on Karma, the user is not onboarded.
-
-For wallet operations, I used database transactions so balance updates and transaction records are committed together. For transfers, the sender debit, receiver credit, and transaction record happen in one transaction. I also used decimal handling for money values to avoid floating point issues.
-
-The project includes unit tests for successful flows and negative cases like blacklisted users, insufficient funds, and missing authentication. The README includes the ER diagram, setup instructions, API endpoints, deployment guide, and improvement plan.
-
-Thank you.
-
-## Email template after submission
-
-Subject: Demo Credit Wallet Service Assessment Submission
-
-Hello Lendsqr Team,
-
-I have submitted my Demo Credit wallet service assessment through the Google Form.
-
-GitHub repository: `<repo-url>`
-Deployed API: `<service-url>`
-Documentation: `<doc-url>`
-Video review: `<video-url>`
-
-Thank you for reviewing my submission.
-
-Best regards,
-`<your name>`
+**Venkata Bhargav Sai Kurakula**
+GitHub: https://github.com/bhargav870
+Deployed API: https://bhargav870-lendsqr-be-test-7bd93a7618f9.herokuapp.com
